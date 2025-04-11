@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
-import  userAccounts  from "./routes/userAccounts.js";
-import  transactions  from "./routes/transactions.js";
+import userAccounts from "./routes/userAccounts.js";
+import transactions from "./routes/transactions.js";
 import errorHandler from "./middleware/errorHandler.js";
 import { connectDB } from "./db/database.js";
 dotenv.config();
