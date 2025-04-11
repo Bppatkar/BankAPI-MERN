@@ -8,18 +8,10 @@ import {
   deleteUser,
 } from "../controllers/userController.js";
 
-
-//Create new user
-router.route("/").post(createUser);
-
-// get all users
-router.route("/").get(getAllUsers);
+//Create new user and get all users
+router.route("/").post(createUser).get(getAllUsers);
 
 // get single user
-router.route("/:id").get(getUser);
-router.route("/:id").put(updateUser);
-
-// deleted user
-router.route("/:id").delete(deleteUser);
+router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
 
 export default router;

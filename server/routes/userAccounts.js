@@ -7,4 +7,4 @@ import { createAccount, getAccount } from "../controllers/accountController.js";
 router.post("/", createAccount);  
 router.get("/:id", getAccount);  
 
-export const userAccounts = router;
+export default router;

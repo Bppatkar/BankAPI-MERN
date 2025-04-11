@@ -16,4 +16,4 @@ router.route("/transfer").post(transferMoney);
 router.route("/usersData/:id").get(getUsersTransactions);
 
 
-export const transactions = router; 
+export default router;
