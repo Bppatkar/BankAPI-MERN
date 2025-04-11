@@ -1,22 +1,24 @@
-import Account from "../models/accountSchema.js";
+import { Account } from "../models/accountSchema.js";
 
-exports.createAccount = async (userId) => {
+export const createAccount = async (userId) => {
   try {
     const account = new Account({
       userId: userId,
       balance: 0,
       credit: 0,
     });
+    await account.save();
+    return account;
   } catch (error) {
     throw new Error(error.message);
   }
 };
 
-exports.getAccount = async (req, res) => {
+export const getAccount = async (req, res) => {
   try {
     const account = await Account.findById(req.params.id);
     if (!account) {
-      return res.status(404).json(account);
+      return res.status(404).json({ message: "Account not found" }); // Fixed response
     }
     res.status(200).json(account);
   } catch (error) {
@@ -24,5 +26,3 @@ exports.getAccount = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
-
-

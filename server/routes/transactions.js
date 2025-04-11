@@ -15,4 +15,5 @@ router.route("/credit").put(updateCredit);
 router.route("/transfer").post(transferMoney);
 router.route("/usersData/:id").get(getUsersTransactions);
 
-module.exports = router;
+
+export const transactions = router; 

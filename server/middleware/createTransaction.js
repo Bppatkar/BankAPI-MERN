@@ -1,5 +1,7 @@
-import Transaction from "../models/transactionSchema.js";
-const createTransaction = async (fromAccountId, toAccountId, amount) => {
+// middleware/createTransaction.js
+import { Transaction } from "../models/transactionSchema.js";
+
+export const createTransaction = async (fromAccountId, toAccountId, amount) => {
   const transactionData = {
     type: "transfer",
     accountId: fromAccountId,
@@ -8,8 +10,5 @@ const createTransaction = async (fromAccountId, toAccountId, amount) => {
   };
   const transaction = new Transaction(transactionData);
   await transaction.save();
-
   return transaction;
 };
-
-module.exports = createTransaction;

@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
       res.json({
         title: "Not Found",
         message: err.message,
-        stackTree: err.stack,
+        stackTrace: err.stack,
       });
       break;
     case constants.VALIDATION_ERROR:
@@ -45,4 +45,4 @@ const errorHandler = (err, req, res, next) => {
   }
 };
 
-module.exports = errorHandler;
+export default errorHandler;

@@ -14,7 +14,7 @@ const accountSchema = new mongoose.Schema(
     credit: {
       type: Number,
       default: 0,
-      validates: {
+      validate: {
         validator: function (value) {
           return value >= 0;
         },
@@ -31,4 +31,4 @@ const accountSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Account", accountSchema);
+export const Account = mongoose.model("Account", accountSchema);
