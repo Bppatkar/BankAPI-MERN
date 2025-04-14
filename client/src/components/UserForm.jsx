@@ -9,6 +9,7 @@ export default function UserForm({ onUserCreated }) {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,16 +19,16 @@ export default function UserForm({ onUserCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post("/api/users", formData);
       setMessage(res.data.message || "User created successfully");
-      setError("");
       setFormData({ firstName: "", lastName: "", email: "" });
       onUserCreated?.();
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.message || "Error creating user");
-      setMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,9 +69,12 @@ export default function UserForm({ onUserCreated }) {
       </div>
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className={`${
+          loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+        } text-white px-4 py-2 rounded transition`}
+        disabled={loading}
       >
-        Create
+        {loading ? "Creating..." : "Create"}
       </button>
       {message && <p className="mt-2 text-sm text-green-700">{message}</p>}
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}

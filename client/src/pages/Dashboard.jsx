@@ -38,18 +38,18 @@ export default function Dashboard() {
     <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <TransactionForm 
+          <TransactionForm
             onTransactionComplete={() => {
               fetchTransactions();
-              setSelectedAccount(null); // Reset to force balance refresh
-            }} 
+              setSelectedAccount(null);
+            }}
             onAccountSelect={setSelectedAccount}
           />
           {selectedAccount && <AccountBalance accountId={selectedAccount} />}
         </div>
         <TransactionList transactions={transactions} users={users} />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UserForm onUserCreated={fetchUsers} />
         <UserList users={users} />

@@ -58,35 +58,38 @@ function UserList() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-4 w-full">
-      <h2 className="text-xl font-semibold mb-4">All Users</h2>
-      {users.length === 0 ? (
-        <p className="text-gray-500">No users found.</p>
-      ) : (
-        users.map((user) => (
-          <div
-            key={user._id}
-            className="flex justify-between items-center border p-2 mb-2 rounded"
-          >
-            <div>
-              <p>
-                {user.firstName} {user.lastName} - {user.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                Balance: {formatCurrency(accounts[user._id] || 0)}
-              </p>
-            </div>
-            <button
-              onClick={() => deleteUser(user._id)}
-              className="flex items-center gap-1 text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-sm transition"
-            >
-              <TrashIcon className="w-4 h-4" />
-              Delete
-            </button>
+    <div className="bg-[#F8FAFC] min-h-screen p-6">
+  <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-[#E2E8F0] p-6">
+    <h2 className="text-2xl font-dm font-semibold text-[#0F172A] mb-4">Customer Overview</h2>
+
+    <div className="grid gap-4">
+      {users.map(user => (
+        <div
+          key={user._id}
+          className="bg-[#F1F5F9] hover:bg-[#E0F2FE] p-4 rounded-xl flex justify-between items-center transition"
+        >
+          <div>
+            <p className="text-lg font-dm text-[#0F172A]">
+              {user.firstName} {user.lastName}
+            </p>
+            <p className="text-sm text-gray-500">{user.email}</p>
+            <p className="text-base font-space text-blue-600 mt-1">
+              Balance: {formatCurrency(accounts[user._id] || 0)}
+            </p>
           </div>
-        ))
-      )}
+          <button
+            onClick={() => deleteUser(user._id)}
+            className="flex items-center gap-2 text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg shadow font-medium"
+          >
+            <TrashIcon className="w-4 h-4" />
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
+  </div>
+</div>
+
   );
 }
 

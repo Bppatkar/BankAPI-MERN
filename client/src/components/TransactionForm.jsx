@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function TransactionForm({ onTransactionComplete, onAccountSelect }) {
+export default function TransactionForm({
+  onTransactionComplete,
+  onAccountSelect,
+}) {
   const [users, setUsers] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [formData, setFormData] = useState({
@@ -26,30 +29,31 @@ export default function TransactionForm({ onTransactionComplete, onAccountSelect
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    if (name === 'fromUser' && value) {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "fromUser" && value) {
       // Fetch account balance when user is selected
-      axios.get(`/api/accounts/balance/${value}`)
-        .then(res => setSelectedAccount(res.data))
-        .catch(err => console.error("Error fetching balance", err));
+      axios
+        .get(`/api/accounts/balance/${value}`)
+        .then((res) => setSelectedAccount(res.data))
+        .catch((err) => console.error("Error fetching balance", err));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate amount
     if (isNaN(formData.amount)) {
       setMessage("Amount must be a number");
       return;
     }
 
-    let payload = { 
-      type: formData.type, 
-      amount: Number(formData.amount) 
+    let payload = {
+      type: formData.type,
+      amount: Number(formData.amount),
     };
-  
+
     if (formData.type === "deposit") {
       payload.accountId = formData.fromUser;
     } else if (formData.type === "withdraw") {
@@ -58,15 +62,15 @@ export default function TransactionForm({ onTransactionComplete, onAccountSelect
       payload.fromAccountId = formData.fromUser;
       payload.toAccountId = formData.toUser;
     }
-  
+
     try {
       await axios.post("/api/transactions/" + formData.type, payload);
       setMessage("Transaction successful");
-      setFormData({ 
-        type: "deposit", 
-        fromUser: "", 
-        toUser: "", 
-        amount: "" 
+      setFormData({
+        type: "deposit",
+        fromUser: "",
+        toUser: "",
+        amount: "",
       });
       onTransactionComplete?.();
     } catch (err) {
@@ -75,17 +79,21 @@ export default function TransactionForm({ onTransactionComplete, onAccountSelect
     }
   };
 
-  return (
-    
+  const formatMoney = (value) =>
+    value !== undefined && value !== null ? value.toFixed(2) : "0.00";
 
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4">
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md space-y-4"
+    >
       <h2 className="text-xl font-semibold">Make a Transaction</h2>
 
       <div className="grid grid-cols-1 gap-4">
-        <select 
-          name="type" 
-          value={formData.type} 
-          onChange={handleChange} 
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
           className="p-2 border rounded w-full"
         >
           <option value="deposit">Deposit</option>
@@ -93,35 +101,37 @@ export default function TransactionForm({ onTransactionComplete, onAccountSelect
           <option value="transfer">Transfer</option>
         </select>
 
-        <select 
-          name="fromUser" 
-          value={formData.fromUser} 
-          onChange={handleChange} 
+        <select
+          name="fromUser"
+          value={formData.fromUser}
+          onChange={handleChange}
           className="p-2 border rounded w-full"
           required
         >
           <option value="">Select User</option>
           {users.map((user) => (
             <option key={user._id} value={user.accountId}>
-              {user.firstName} {user.lastName} (Acct: {user.accountId?.slice(-4)})
+              {user.firstName} {user.lastName} (Acct:{" "}
+              {user.accountId?.slice(-4)})
             </option>
           ))}
         </select>
 
         {formData.type === "transfer" && (
-          <select 
-            name="toUser" 
-            value={formData.toUser} 
-            onChange={handleChange} 
+          <select
+            name="toUser"
+            value={formData.toUser}
+            onChange={handleChange}
             className="p-2 border rounded w-full"
             required
           >
             <option value="">Select Recipient</option>
             {users
-              .filter(user => user._id !== formData.fromUser)
+              .filter((user) => user._id !== formData.fromUser)
               .map((user) => (
                 <option key={user._id} value={user.accountId}>
-                  {user.firstName} {user.lastName} (Acct: {user.accountId?.slice(-4)})
+                  {user.firstName} {user.lastName} (Acct:{" "}
+                  {user.accountId?.slice(-4)})
                 </option>
               ))}
           </select>
@@ -139,28 +149,30 @@ export default function TransactionForm({ onTransactionComplete, onAccountSelect
           required
         />
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Submit
         </button>
 
         {message && (
-          <p className={`text-sm ${
-            message.includes("success") ? "text-green-700" : "text-red-600"
-          }`}>
+          <p
+            className={`text-sm ${
+              message.includes("success") ? "text-green-700" : "text-red-600"
+            }`}
+          >
             {message}
           </p>
         )}
         {selectedAccount && (
-      <div className="bg-blue-50 p-4 rounded-lg mt-4">
-        <h3 className="font-bold">Account Balance</h3>
-        <p>Available: ₹{selectedAccount.availableBalance.toFixed(2)}</p>
-        <p>Balance: ₹{selectedAccount.balance.toFixed(2)}</p>
-        <p>Credit: ₹{selectedAccount.credit.toFixed(2)}</p>
-      </div>
-    )}
+          <div className="bg-blue-50 p-4 rounded-lg mt-4">
+            <h3 className="font-bold">Account Balance</h3>
+            <p>Available: ₹{formatMoney(selectedAccount?.availableBalance)}</p>
+            <p>Balance: ₹{formatMoney(selectedAccount?.balance)}</p>
+            <p>Credit: ₹{formatMoney(selectedAccount?.credit)}</p>
+          </div>
+        )}
       </div>
     </form>
   );
