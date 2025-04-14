@@ -9,7 +9,9 @@ import AccountBalance from "../components/AccountBalance";
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserTransactions, setSelectedUserTransactions] = useState([]);
+  const [selectedUserBalance, setSelectedUserBalance] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -29,6 +31,33 @@ export default function Dashboard() {
     }
   };
 
+  const fetchUserDetails = async (accountId) => {
+    try {
+      const balanceRes = await axios.get(`/api/accounts/balance/${accountId}`);
+      console.log("Balance API Response:", balanceRes.data);
+
+      // Access the balance property explicitly
+      const balance = parseFloat(balanceRes.data.balance) || 0;
+
+      const userTransactions = transactions.filter(
+        (txn) =>
+          txn.fromAccountId === accountId || txn.toAccountId === accountId
+      );
+
+      setSelectedUserBalance(balance);
+      setSelectedUserTransactions(userTransactions);
+    } catch (err) {
+      console.error("Failed to fetch user details", err);
+      setSelectedUserBalance(0); // Fallback to 0 if fetching balance fails
+      setSelectedUserTransactions([]);
+    }
+  };
+
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    fetchUserDetails(user.accountId);
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchTransactions();
@@ -40,22 +69,37 @@ export default function Dashboard() {
         <div className="space-y-6">
           <div className="card">
             <TransactionForm
-              users={users} // Pass the updated users list
+              users={users}
               onTransactionComplete={() => {
                 fetchTransactions();
-                setSelectedAccount(null);
+                if (selectedUser) fetchUserDetails(selectedUser.accountId);
               }}
-              onAccountSelect={setSelectedAccount}
+              onAccountSelect={(accountId) => fetchUserDetails(accountId)}
             />
           </div>
-          {selectedAccount && (
+          {selectedUser && (
             <div className="card">
-              <AccountBalance accountId={selectedAccount} />
+              <AccountBalance accountId={selectedUser.accountId} />
             </div>
           )}
         </div>
         <div className="card">
-          <TransactionList transactions={transactions} users={users} />
+          {selectedUser ? (
+            <>
+              <h2 className="text-xl font-semibold mb-4">
+                {selectedUser.firstName} {selectedUser.lastName}'s Transactions
+              </h2>
+              <TransactionList
+                transactions={selectedUserTransactions}
+                users={users}
+              />
+              <p className="mt-4 text-gray-600">
+                Balance: ₹{Number(selectedUserBalance)?.toFixed(2) || "0.00"}
+              </p>
+            </>
+          ) : (
+            <TransactionList transactions={transactions} users={users} />
+          )}
         </div>
       </div>
 
@@ -69,7 +113,9 @@ export default function Dashboard() {
             onUserDeleted={() => {
               fetchUsers();
               fetchTransactions();
+              if (selectedUser) setSelectedUser(null);
             }}
+            onUserSelected={handleUserSelect} // Pass the user selection handler
           />
         </div>
       </div>

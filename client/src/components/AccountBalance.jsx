@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function AccountBalance({ accountId }) {
   const [balance, setBalance] = useState(null);
@@ -7,43 +7,44 @@ export default function AccountBalance({ accountId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!accountId) return;
+
     const fetchBalance = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const res = await axios.get(`/api/accounts/balance/${accountId}`);
-        setBalance(res.data);
-        setError(null);
+        // console.log("Account ID:", accountId);
+        // console.log("Balance API Response:", res.data);
+
+        // Access the balance property explicitly
+        const fetchedBalance = parseFloat(res.data.balance) || 0; // Ensure balance is a number
+        setBalance(fetchedBalance);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch balance");
+        console.error("Failed to fetch account balance", err);
+        setError("Failed to load balance");
       } finally {
         setLoading(false);
       }
     };
 
-    if (accountId) {
-      fetchBalance();
-    }
+    fetchBalance();
   }, [accountId]);
 
-  if (loading) return <div>Loading balance...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!balance) return null;
+  if (loading) {
+    return <p>Loading balance...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-      <h3 className="text-lg font-semibold mb-2">Account Balance</h3>
-      <div className="grid grid-cols-2 gap-2">
-        <div>Account Number:</div>
-        <div className="font-medium">{balance.accountNumber}</div>
-        
-        <div>Available Balance:</div>
-        <div className="font-medium">₹{balance.availableBalance.toFixed(2)}</div>
-        
-        <div>Current Balance:</div>
-        <div className="font-medium">₹{balance.balance.toFixed(2)}</div>
-        
-        <div>Credit Limit:</div>
-        <div className="font-medium">₹{balance.credit.toFixed(2)}</div>
-      </div>
+    <div>
+      <h3 className="text-lg font-semibold">Account Balance</h3>
+      <p className="text-gray-600">
+        Balance: ₹{Number(balance)?.toFixed(2) || "0.00"}
+      </p>
     </div>
   );
 }
