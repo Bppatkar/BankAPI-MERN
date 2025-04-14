@@ -12,6 +12,7 @@ import {
 router.route("/").post(createUser).get(getAllUsers);
 
 // get single user
-router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
+router.route("/:id").get(getUser).put(updateUser);
+router.delete("/:id", deleteUser);
 
 export default router;
