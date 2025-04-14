@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function TransactionForm({ onTransactionComplete }) {
+export default function TransactionForm({ onTransactionComplete, onAccountSelect }) {
   const [users, setUsers] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [formData, setFormData] = useState({
     type: "deposit",
     fromUser: "",
@@ -24,7 +25,15 @@ export default function TransactionForm({ onTransactionComplete }) {
   }, []);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'fromUser' && value) {
+      // Fetch account balance when user is selected
+      axios.get(`/api/accounts/balance/${value}`)
+        .then(res => setSelectedAccount(res.data))
+        .catch(err => console.error("Error fetching balance", err));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -67,6 +76,8 @@ export default function TransactionForm({ onTransactionComplete }) {
   };
 
   return (
+    
+
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4">
       <h2 className="text-xl font-semibold">Make a Transaction</h2>
 
@@ -142,6 +153,14 @@ export default function TransactionForm({ onTransactionComplete }) {
             {message}
           </p>
         )}
+        {selectedAccount && (
+      <div className="bg-blue-50 p-4 rounded-lg mt-4">
+        <h3 className="font-bold">Account Balance</h3>
+        <p>Available: ₹{selectedAccount.availableBalance.toFixed(2)}</p>
+        <p>Balance: ₹{selectedAccount.balance.toFixed(2)}</p>
+        <p>Credit: ₹{selectedAccount.credit.toFixed(2)}</p>
+      </div>
+    )}
       </div>
     </form>
   );

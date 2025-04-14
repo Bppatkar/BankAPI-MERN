@@ -4,10 +4,12 @@ import UserForm from "../components/UserForm";
 import UserList from "../components/UserList";
 import TransactionForm from "../components/TransactionForm";
 import TransactionList from "../components/TransactionList";
+import AccountBalance from "../components/AccountBalance";
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
-  const [transactions, setTransactions] = useState([]); // new
+  const [transactions, setTransactions] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -34,10 +36,24 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 p-6">
-      <TransactionForm onTransactionComplete={fetchTransactions} />
-      <TransactionList transactions={transactions} users={users} />
-      <UserForm onUserCreated={fetchUsers} />
-      <UserList users={users} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <TransactionForm 
+            onTransactionComplete={() => {
+              fetchTransactions();
+              setSelectedAccount(null); // Reset to force balance refresh
+            }} 
+            onAccountSelect={setSelectedAccount}
+          />
+          {selectedAccount && <AccountBalance accountId={selectedAccount} />}
+        </div>
+        <TransactionList transactions={transactions} users={users} />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <UserForm onUserCreated={fetchUsers} />
+        <UserList users={users} />
+      </div>
     </div>
   );
 }

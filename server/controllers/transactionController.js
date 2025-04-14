@@ -1,6 +1,7 @@
 import { Transaction } from "../models/transactionSchema.js";
 import { Account } from "../models/accountSchema.js";
 import { User } from "../models/userModel.js";
+import mongoose from "mongoose";
 
 export const depositCash = async (req, res) => {
   try {
@@ -249,5 +250,25 @@ export const updateCredit = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const getAllTransactions = async (req, res) => {
+  try {
+    const transactions = await Transaction.find()
+      .populate("accountId", "accountNumber")
+      .populate("toAccountId", "accountNumber")
+      .sort({ timestamp: -1 });
+
+    res.json({
+      message: "All transactions retrieved successfully",
+      transactions,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch transactions",
+      error: error.message,
+    });
   }
 };

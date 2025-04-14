@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+
+.balance-card {
+  background: linear-gradient(135deg, #f6f7f9 0%, #e9ebee 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.balance-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a365d;
+}
+

@@ -5,9 +5,10 @@ import {
   withdrawMoney,
   updateCredit,
   transferMoney,
-  getUsersTransactions
+  getUsersTransactions,getAllTransactions
 } from "../controllers/transactionController.js";
 
+router.route("/").get(getAllTransactions);
 router.route("/deposit").post(depositCash);
 router.route("/withdraw").post(withdrawMoney);
 router.route("/credit").put(updateCredit);
