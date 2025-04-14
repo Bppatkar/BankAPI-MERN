@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function TransactionForm({
+  users, // Receive the updated users list as a prop
   onTransactionComplete,
   onAccountSelect,
 }) {
-  const [users, setUsers] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [formData, setFormData] = useState({
     type: "deposit",
@@ -14,18 +14,6 @@ export default function TransactionForm({
     amount: "",
   });
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get("/api/users");
-        setUsers(res.data.users);
-      } catch (err) {
-        console.error("Failed to fetch users", err);
-      }
-    };
-    fetchUsers();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,18 +71,17 @@ export default function TransactionForm({
     value !== undefined && value !== null ? value.toFixed(2) : "0.00";
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md space-y-4"
-    >
-      <h2 className="text-xl font-semibold">Make a Transaction</h2>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-2xl font-semibold text-primary">
+        Make a Transaction
+      </h2>
 
       <div className="grid grid-cols-1 gap-4">
         <select
           name="type"
           value={formData.type}
           onChange={handleChange}
-          className="p-2 border rounded w-full"
+          className="input-field"
         >
           <option value="deposit">Deposit</option>
           <option value="withdraw">Withdraw</option>
@@ -105,7 +92,7 @@ export default function TransactionForm({
           name="fromUser"
           value={formData.fromUser}
           onChange={handleChange}
-          className="p-2 border rounded w-full"
+          className="input-field"
           required
         >
           <option value="">Select User</option>
@@ -122,12 +109,12 @@ export default function TransactionForm({
             name="toUser"
             value={formData.toUser}
             onChange={handleChange}
-            className="p-2 border rounded w-full"
+            className="input-field"
             required
           >
             <option value="">Select Recipient</option>
             {users
-              .filter((user) => user._id !== formData.fromUser)
+              .filter((user) => user.accountId !== formData.fromUser)
               .map((user) => (
                 <option key={user._id} value={user.accountId}>
                   {user.firstName} {user.lastName} (Acct:{" "}
@@ -143,16 +130,13 @@ export default function TransactionForm({
           placeholder="Amount"
           value={formData.amount}
           onChange={handleChange}
-          className="p-2 border rounded w-full"
+          className="input-field"
           min="0.01"
           step="0.01"
           required
         />
 
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
+        <button type="submit" className="button-primary">
           Submit
         </button>
 
@@ -164,14 +148,6 @@ export default function TransactionForm({
           >
             {message}
           </p>
-        )}
-        {selectedAccount && (
-          <div className="bg-blue-50 p-4 rounded-lg mt-4">
-            <h3 className="font-bold">Account Balance</h3>
-            <p>Available: ₹{formatMoney(selectedAccount?.availableBalance)}</p>
-            <p>Balance: ₹{formatMoney(selectedAccount?.balance)}</p>
-            <p>Credit: ₹{formatMoney(selectedAccount?.credit)}</p>
-          </div>
         )}
       </div>
     </form>

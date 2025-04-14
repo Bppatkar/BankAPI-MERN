@@ -35,24 +35,43 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <TransactionForm
-            onTransactionComplete={() => {
-              fetchTransactions();
-              setSelectedAccount(null);
-            }}
-            onAccountSelect={setSelectedAccount}
-          />
-          {selectedAccount && <AccountBalance accountId={selectedAccount} />}
+          <div className="card">
+            <TransactionForm
+              users={users} // Pass the updated users list
+              onTransactionComplete={() => {
+                fetchTransactions();
+                setSelectedAccount(null);
+              }}
+              onAccountSelect={setSelectedAccount}
+            />
+          </div>
+          {selectedAccount && (
+            <div className="card">
+              <AccountBalance accountId={selectedAccount} />
+            </div>
+          )}
         </div>
-        <TransactionList transactions={transactions} users={users} />
+        <div className="card">
+          <TransactionList transactions={transactions} users={users} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <UserForm onUserCreated={fetchUsers} />
-        <UserList users={users} />
+        <div className="card">
+          <UserForm onUserCreated={fetchUsers} />
+        </div>
+        <div className="card">
+          <UserList
+            users={users}
+            onUserDeleted={() => {
+              fetchUsers();
+              fetchTransactions();
+            }}
+          />
+        </div>
       </div>
     </div>
   );
